@@ -134,7 +134,7 @@ class WebullMarketData:
         for row in rows:
             quote = StockQuote.from_row(row)
             if quote.symbol:
-                seen[quote.symbol] = quote
+                seen.setdefault(quote.symbol, quote)  # first (richer) row wins
         return list(seen.values())
 
     def snapshots(self, symbols: list[str]) -> dict[str, StockQuote]:
@@ -167,6 +167,16 @@ class WebullMarketData:
             if day >= today:
                 upcoming.append(day)
         return min(upcoming) if upcoming else None
+
+    def option_mids(self, option_symbols: list[str]) -> dict[str, float]:
+        """Current mid price per option symbol (used when grading open spreads)."""
+        out = {}
+        for row in self.client.option_snapshots(option_symbols):
+            bid, ask = num(row, "bid", "bid_price"), num(row, "ask", "ask_price")
+            mid = (bid + ask) / 2 if bid > 0 and ask > 0 else num(row, "price", "last")
+            if row.get("symbol"):
+                out[str(row["symbol"])] = round(mid, 2)
+        return out
 
     def put_chain(
         self, symbol: str, expiry_from: date, expiry_to: date, strike_min: float, strike_max: float
