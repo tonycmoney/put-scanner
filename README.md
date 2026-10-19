@@ -4,7 +4,7 @@
 
 A service that watches the day's biggest stock movers on Webull market data, finds put selling setups that pass a strict rule set, and sizes each one two ways: a defined risk **put credit spread** and a **cash secured put**. It runs on a market hours schedule, sends alerts, grades every pick after the close, and learns which kinds of setups to stop taking.
 
-**Live:** https://put-scanner-production.up.railway.app
+**Live:** https://web-production-6f005.up.railway.app
 
 > **Alerts only.** The scanner reads market data. It has no code path that places, changes or cancels orders, and CI fails the build if one appears. Nothing here is financial advice.
 
